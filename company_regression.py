@@ -6,7 +6,7 @@ import psycopg2
 conn=psycopg2.connect('dbname=acuteiq')
 cur=conn.cursor()
 
-work_type=1
+work_type=2
 
 if work_type==1:
     cur.execute('SELECT zip, industry_sic_code, number_of_employees FROM company')
@@ -29,10 +29,11 @@ data = np.array(data)
 
 data_len = len(data)
 train_range_limit = int(data_len*0.75)
-
+print 'data_len', data_len, "train_range_limit", train_range_limit
 ols = linear_model.LinearRegression()
-ols.fit(data[:(-1*train_range_limit),1], data[:(-1*train_range_limit),2])
+feature_range = (1,)
+ols.fit(data[:train_range_limit, feature_range], data[:train_range_limit,2])
 
-test_result = ols.predict( data[ (-1*train_range_limit), 1] )
+test_result = ols.predict( data[ train_range_limit:, feature_range] )
 
-print np.sqrt(np.mean((data[ (-1*train_range_limit), 2 ] - test_result)**2))
+print np.sqrt(np.mean((data[ train_range_limit:, 2 ] - test_result)**2))
