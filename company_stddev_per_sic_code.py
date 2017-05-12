@@ -1,4 +1,3 @@
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import linear_model
@@ -30,6 +29,7 @@ for work_type in all_work_types:
     for significant_digits in all_significant_digits:
         print ("significant_digits", significant_digits)
         reduced_sic_codes = set()
+        found_stddev=0
         for sic_code in all_sic_codes:
             if sic_code:
                 sic_code_digit_num = len(str(sic_code))
@@ -40,8 +40,7 @@ for work_type in all_work_types:
 
         #start_time=datetime.now()
         #print ('start date', start_time)
-        total_rmse=0
-        rmse_found_count=0
+        total_stddev=0
         for sic_code_index, sic_code_lower_bound in enumerate(list(reduced_sic_codes)):
             percent_done = sic_code_index*100.0/len(reduced_sic_codes)
             sic_code_digit_num = len(str(sic_code_lower_bound))
@@ -83,22 +82,12 @@ for work_type in all_work_types:
             random.shuffle(data)
 
             data = np.array(data)
+            total_stddev += np.std(data)
+            found_stddev += 1
+            print ('sic_code_lower_bound', sic_code_lower_bound, 'stddev %2.f'% np.std(data), )
 
-            train_range_limit = int(data_len*0.75)
-
-            ols = linear_model.LinearRegression()
-            feature_range = (0,1) 
-            ols.fit(data[:train_range_limit, feature_range], data[:train_range_limit,2])
-
-            test_result = ols.predict( data[ train_range_limit:, feature_range] )
-            test_ground_truth = data[ train_range_limit:, 2 ]
-            rmse = np.sqrt(np.mean((test_ground_truth - test_result)**2))
-            total_rmse += rmse
-            rmse_found_count += 1
-            print ('sic_code_lower_bound', sic_code_lower_bound, 'RMSE %2.f'% rmse, 'number of test data', test_ground_truth.size, 'min', min(test_ground_truth), 'max', max(test_ground_truth), 'mean %.2f'% (sum(test_ground_truth)/float(test_ground_truth.size) ))
-
-        if rmse_found_count == 0:
-            print( 'rmse_found_count is 0!')
+        if found_stddev == 0:
+            print( 'stddev found is 0!')
         else:
-            print ('average rmse %.2f' % ( total_rmse/float(rmse_found_count)), 'rmse_found_count', rmse_found_count)
+            print ('average stddev %.2f' % ( total_stddev/found_stddev), 'found_stdde', found_stddev)
         print ('total number of sic_codes', len(all_sic_codes), 'total number of reduces sic_codes', len(reduced_sic_codes))
