@@ -1,13 +1,17 @@
 import psycopg2
 import os
 import csv
+import sys
+from zip_to_int import zip_to_int
+#exitcount=1000
 
 DATA_DIR='../data/data_export_ck'
 DATA_FILE_PREFIX='tbl_company'
 conn=psycopg2.connect('dbname=acuteiq')
 cur=conn.cursor()
 
-company_import_col_names=['id', 'zip', 'industry_sic_code', 'number_of_employees', 'yearly_sales']
+company_import_col_names=['id', 'zip', 'industry_sic_code', 'number_of_employees', 'yearly_sales', 'company_name_cleaned', 'city', 'state', 'county']
+company_import_col_types=['int', 'int', 'int', 'int', 'int', 'str', 'str', 'str', 'str']
 data_line_count=0
 seen_ids=[]
 for filename in os.listdir(DATA_DIR):
@@ -17,7 +21,7 @@ for filename in os.listdir(DATA_DIR):
         header_line=True
         file_column_names=[]
         for line in csvreader:
-            sqlcmd='INSERT INTO company2 (' + ','.join(company_import_col_names) + ') VALUES (%s, %s, %s, %s, %s)'
+            sqlcmd='INSERT INTO company1 (' + ','.join(company_import_col_names) + ') VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
             sqldata=[None]*len(company_import_col_names)
             if header_line:
                 header_line=False
@@ -25,32 +29,65 @@ for filename in os.listdir(DATA_DIR):
             else:
                 data_line_count+=1
                 for column_index, column_data in enumerate(line):
-                    column_name=file_column_names[column_index]
+                    column_name=file_column_names[column_index].lower()
                     if column_name in company_import_col_names:
                         valid_data=True
-                        column_data_int=0
+                        is_int=False
                         try:
-                            column_data_int=int(column_data)
-                            if column_data_int == 0:
+                            column_data=int(column_data)
+                            if column_data == 0:
                                 valid_data=False
+                            is_int=True
                         except:
                             pass
 
-                        if column_data == 'null':
+                        if column_data == 'null' or column_data == 'NULL':
                             valid_data=False
+
+                        #print ('column_name', column_name)
+                        if company_import_col_types[company_import_col_names.index(column_name)] == 'int' and is_int == False:
+                            #print( 'was expecting integer, found non-integer', 'column_name', column_name, 'column_data', column_data, 'line', line, 'file_column_names', file_column_names )
+                            valid_data=False
+
+                        if column_name == 'zip' and is_int == False:
+                            column_data = zip_to_int(column_data)
+
+                        if column_data and is_int == False:
+                            column_data = column_data.lower()
 
                         if valid_data:
                             company_import_col_names.index(column_name)
-                            if column_name == 'industry_sic_code' and len(str(column_data_int))>4:
-                                raise Exception('wtf ' + str(column_name) + ' ' + sqlcmd + ' ' + str(data_line_count) + ' ' + str(column_index) + ' ' + filename + ' ' + str(line) + str(column_data_int) + ' WWW' + line[column_index] + ' www1 ' + column_data + ' www2 ' + str(column_data_int) + ' file_column_names ' + str(file_column_names))
+                            if column_name == 'industry_sic_code' and len(str(column_data))>4:
+                                raise Exception('wtf ' + str(column_name) + ' ' + sqlcmd + ' ' + str(data_line_count) + ' ' + str(column_index) + ' ' + filename + ' ' + str(line) + str(column_data) + ' WWW' + line[column_index] + ' www1 ' + column_data + ' file_column_names ' + str(file_column_names))
+
+                            #print ('WTF', 'column_name', column_name, column_data)
                             
-                            sqldata[company_import_col_names.index(column_name)]=column_data_int
+                            sqldata[company_import_col_names.index(column_name)]=column_data
+                        #else:
+                        #    print ('WTF2', 'column_name', column_name, column_data)
+                            
 
                 #print sqldata
                 # if sqldata[0] not in seen_ids:
                 #     seen_ids.append(sqldata[0])
                 #     if None not in sqldata:
-                cur.execute(sqlcmd, sqldata)
+                # print('\n')
+                # print('file_column_names', file_column_names)
+                # print('line',line)
+                # print('sqldata',sqldata)
+
+                # if exitcount == 0:
+                #      sys.exit(1)
+                # exitcount-=1
+
+                try:
+                    cur.execute(sqlcmd, sqldata)
+                except Exception as e:
+                    print('line', line)
+                    print('file_column_names', file_column_names)
+                    print(sqlcmd, sqldata)
+                    raise e
+
                     #else:
                     #    print 'Do not insert data with None: ' + str(sqldata)
                 #else:
