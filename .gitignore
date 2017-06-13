@@ -3,3 +3,4 @@
 auth
 todo
 *.json
+*.pyc
