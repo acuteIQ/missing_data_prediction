@@ -14,19 +14,19 @@ cur=conn.cursor()
 
 #plot=False
 
-cur.execute('select distinct county from company1')
+cur.execute('select distinct county from company3')
 counties = {}
 for c in cur:
     if c:
         counties[c[0]] = len(counties)
 
-cur.execute('select distinct city from company1')
+cur.execute('select distinct city from company3')
 cities = {}
 for c in cur:
     if c:
         cities[c[0]] = len(cities)
 
-cur.execute('select state state from company1')
+cur.execute('select state state from company3')
 states = {}
 for c in cur:
     if c:
@@ -35,9 +35,9 @@ for c in cur:
 for work_type in [1,2]:
     print ('work_type', work_type)
     if work_type == 1:
-        cur.execute('SELECT zip, industry_sic_code, city, state, county, number_of_employees FROM company1')
+        cur.execute('SELECT zip, industry_sic_code, city, state, county, number_of_employees FROM company3')
     else:
-        cur.execute('SELECT zip, industry_sic_code, city, state, county, cast(yearly_sales as numeric) FROM company1')
+        cur.execute('SELECT zip, industry_sic_code, city, state, county, cast(yearly_sales as numeric) FROM company3')
 
     data = [];
     row = cur.fetchone()

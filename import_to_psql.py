@@ -21,7 +21,7 @@ for filename in os.listdir(DATA_DIR):
         header_line=True
         file_column_names=[]
         for line in csvreader:
-            sqlcmd='INSERT INTO company1 (' + ','.join(company_import_col_names) + ') VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+            sqlcmd='INSERT INTO company3 (' + ','.join(company_import_col_names) + ') VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
             sqldata=[None]*len(company_import_col_names)
             if header_line:
                 header_line=False
@@ -63,9 +63,9 @@ for filename in os.listdir(DATA_DIR):
                             #print ('WTF', 'column_name', column_name, column_data)
                             
                             sqldata[company_import_col_names.index(column_name)]=column_data
-                        #else:
-                        #    print ('WTF2', 'column_name', column_name, column_data)
-                            
+                        else:
+                            break
+                            #print ('WTF2', 'column_name', column_name, column_data)
 
                 #print sqldata
                 # if sqldata[0] not in seen_ids:
@@ -81,7 +81,8 @@ for filename in os.listdir(DATA_DIR):
                 # exitcount-=1
 
                 try:
-                    cur.execute(sqlcmd, sqldata)
+                    if valid_data:
+                        cur.execute(sqlcmd, sqldata)
                 except Exception as e:
                     print('line', line)
                     print('file_column_names', file_column_names)
