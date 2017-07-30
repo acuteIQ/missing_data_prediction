@@ -6,12 +6,12 @@ from zip_to_int import zip_to_int
 #exitcount=1000
 
 DATA_DIR='../data/data_export_ck'
-DATA_FILE_PREFIX='tbl_company'
+DATA_FILE_PREFIX='tbl_equifax'
 conn=psycopg2.connect('dbname=acuteiq')
 cur=conn.cursor()
 
-company_import_col_names=['id', 'zip', 'industry_sic_code', 'number_of_employees', 'yearly_sales', 'company_name_cleaned', 'city', 'state', 'county']
-company_import_col_types=['int', 'int', 'int', 'int', 'int', 'str', 'str', 'str', 'str']
+company_import_col_names=['company_id', 'efx_creditperc', 'efx_failrate', 'efx_faillevel']
+company_import_col_types=['int', 'int', 'int', 'int']
 data_line_count=0
 seen_ids=[]
 for filename in os.listdir(DATA_DIR):
@@ -21,16 +21,19 @@ for filename in os.listdir(DATA_DIR):
         header_line=True
         file_column_names=[]
         for line in csvreader:
-            sqlcmd='INSERT INTO company3 (' + ','.join(company_import_col_names) + ') VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+            sqlcmd='INSERT INTO equifax (' + ','.join(company_import_col_names) + ') VALUES (%s, %s, %s, %s)'
             sqldata=[None]*len(company_import_col_names)
             if header_line:
                 header_line=False
                 file_column_names=line
+                #print ('header_line', file_column_names)
             else:
                 data_line_count+=1
                 for column_index, column_data in enumerate(line):
                     column_name=file_column_names[column_index].lower()
+                    #print ('column_name',column_name)
                     if column_name in company_import_col_names:
+                        #print (column_name)
                         valid_data=True
                         is_int=False
                         try:
@@ -39,9 +42,11 @@ for filename in os.listdir(DATA_DIR):
                                 valid_data=False
                             is_int=True
                         except:
+                            #print ('Bad integer', 'column_name', column_name, 'column_data', column_data, 'line', line, 'file_column_names', file_column_names )
                             pass
 
                         if column_data == 'null' or column_data == 'NULL':
+                            #print( 'found null', 'column_name', column_name, 'column_data', column_data, 'line', line, 'file_column_names', file_column_names )
                             valid_data=False
 
                         #print ('column_name', column_name)
@@ -56,18 +61,12 @@ for filename in os.listdir(DATA_DIR):
                             column_data = column_data.lower()
 
                         if valid_data:
-                            #company_import_col_names.index(column_name)
-                            if column_name == 'industry_sic_code' and len(str(column_data))>4:
-                                raise Exception('wtf ' + str(column_name) + ' ' + sqlcmd + ' ' + str(data_line_count) + ' ' + str(column_index) + ' ' + filename + ' ' + str(line) + str(column_data) + ' WWW' + line[column_index] + ' www1 ' + column_data + ' file_column_names ' + str(file_column_names))
-
-                            #print ('WTF', 'column_name', column_name, column_data)
-                            
                             sqldata[company_import_col_names.index(column_name)]=column_data
                         else:
-                            break
                             #print ('WTF2', 'column_name', column_name, column_data)
+                            break
 
-                #print sqldata
+                #print (sqldata)
                 # if sqldata[0] not in seen_ids:
                 #     seen_ids.append(sqldata[0])
                 #     if None not in sqldata:

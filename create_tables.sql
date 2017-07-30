@@ -39,9 +39,26 @@ select * from company ou where ( select count(*) from company inr where inr.id =
 
 
 CREATE TABLE company_prediction (
-       id bigint,
-       yearly_sales money,
-       credit_risk smallint,
-       failure_score smallint,
-       number_of_employees smallint
+       id bigint PRIMARY KEY,
+       yearly_sales smallint,
+       number_of_employees smallint,
+       credit_score smallint,
+       business_risk smallint
 );
+insert into company_prediction (id) (SELECT id FROM company1);
+
+
+CREATE TABLE equifax (
+       company_id bigint PRIMARY KEY,
+       EFX_CREDITPERC smallint,
+       EFX_FAILRATE smallint,
+       EFX_FAILLEVEL smallint
+);
+
+
+create index on company1(county);
+create index on company1 (city);
+create index on company1 (state);
+create index on company3 (county);
+create index on company3 (city);
+create index on company3 (state);

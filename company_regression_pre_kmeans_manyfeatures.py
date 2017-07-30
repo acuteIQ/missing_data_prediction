@@ -14,19 +14,19 @@ cur=conn.cursor()
 
 #plot=False
 
-cur.execute('select distinct county from company3')
+cur.execute('select distinct county from company1')
 counties = {}
 for c in cur:
     if c:
         counties[c[0]] = len(counties)
 
-cur.execute('select distinct city from company3')
+cur.execute('select distinct city from company1')
 cities = {}
 for c in cur:
     if c:
         cities[c[0]] = len(cities)
 
-cur.execute('select state state from company3')
+cur.execute('select state state from company1')
 states = {}
 for c in cur:
     if c:
@@ -116,6 +116,9 @@ for work_type in [1,2]:
                 total_rmse += rsme
                 print ('RSME', rsme)
 
+fit from company3
+predict from company1, if feature missing use cluster average value for that column
+                
                 # if plot:
                 #     if len(feature_range) == 1:
                 #         plt.figure()
