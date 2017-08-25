@@ -10,3 +10,5 @@ vacuum full company3;
 vacuum full company_prediction;
 \echo 6
 vacuum full equifax;
+\echo 7
+vacuum full company_tf_observation;

@@ -6,8 +6,6 @@ import random
 from sklearn.cluster import KMeans
 from get_range import get_revenue_range
 from get_range import get_employee_range
-from get_range import sales_ranges
-from get_range import employee_ranges
 from get_target_col_name import get_target_col_name
 import matplotlib.pyplot as plt
 
