@@ -54,22 +54,24 @@ for row in cur2:
     state = coded_objects['state'][state_str]
     county = coded_objects['county'][county_str]
 
+    
     if yearly_sales:
-        yearly_sales = get_revenue_range(yearly_sales)
+        yearly_sales_new = get_revenue_range(yearly_sales)
     else:
-        yearly_sales = None
+        yearly_sales_new = None
     if number_of_employees:
         number_of_employees = get_employee_range(number_of_employees)
     else:
         number_of_employees = None
 
-    #print ('row_id', row_id, 'yearly_sales', yearly_sales, 'number_of_employees', number_of_employees,
+    print ('yearly_sales', yearly_sales, 'yearly_sales_new', yearly_sales_new)
+    #print ('row_id', row_id, 'yearly_sales', yearly_sales_new, 'number_of_employees', number_of_employees,
     #       'credit_score', credit_score, 'business_risk', business_risk, 'industry_sic_code', industry_sic_code,
     #       'city_str', city_str, 'city', city, 'state_str', state_str,
     #       'state', state, 'county_str', county_str, 'county', county)
 
     sqlcmd = "INSERT INTO company_tf_observation (id, yearly_sales, number_of_employees,  credit_score, business_risk, industry_sic_code,  city_str, city, state_str,  state, county_str, county) VALUES (%s, %s, %s,  %s, %s, %s,  %s, %s, %s,  %s, %s, %s )"
-    sqldata = (row_id, yearly_sales, number_of_employees, credit_score, business_risk, industry_sic_code, city_str, city, state_str, state, county_str, county)
+    sqldata = (row_id, yearly_sales_new, number_of_employees, credit_score, business_risk, industry_sic_code, city_str, city, state_str, state, county_str, county)
     #print sqlcmd, sqldata
     cur3.execute(sqlcmd, sqldata)
     

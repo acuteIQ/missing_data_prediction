@@ -1,0 +1,22 @@
+import psycopg2
+import matplotlib.pyplot as plt
+
+conn=psycopg2.connect('dbname=acuteiq')
+cur=conn.cursor()
+
+hist_col_names=['yearly_sales', 'number_of_employees', 'credit_score', 'business_risk']
+#bins= [ range(11), range(11), range(1,101), range(1,10) ]
+bins = [ range(11), range(11), range(1,101,11), range(1,10) ]
+for col_name_index, col_name in enumerate(hist_col_names):
+    print (col_name)
+    plt.figure()
+    cur.execute('select ' + col_name + ' from company_tf_observation_orig where ' + col_name + ' is not null ')
+    print ('sql done')
+    res = cur.fetchall()
+    res_plt = list(map(lambda i: int(i[0]),res))
+    print ('fetch done')
+    print (res[0:10])
+    plt.title(col_name)
+    plt.hist(res_plt, bins[col_name_index])
+    print ( 'hist done')
+    plt.show()
