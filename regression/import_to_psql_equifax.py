@@ -5,13 +5,13 @@ import sys
 from zip_to_int import zip_to_int
 #exitcount=1000
 
-DATA_DIR='../data/data_export_ck'
+DATA_DIR='/home/can/projeler/upwork/acuteiq/data/data_export_ck'
 DATA_FILE_PREFIX='tbl_equifax'
 conn=psycopg2.connect('dbname=acuteiq')
 cur=conn.cursor()
 
-company_import_col_names=['company_id', 'efx_creditperc', 'efx_failrate', 'efx_faillevel']
-company_import_col_types=['int', 'int', 'int', 'int']
+company_import_col_names=['company_id', 'efx_creditperc', 'efx_failrate', 'efx_faillevel', 'efx_creditscore']
+company_import_col_types=['int', 'int', 'int', 'int', 'int']
 data_line_count=0
 seen_ids=[]
 for filename in os.listdir(DATA_DIR):
@@ -21,7 +21,7 @@ for filename in os.listdir(DATA_DIR):
         header_line=True
         file_column_names=[]
         for line in csvreader:
-            sqlcmd='INSERT INTO equifax (' + ','.join(company_import_col_names) + ') VALUES (%s, %s, %s, %s)'
+            sqlcmd='INSERT INTO equifax (' + ','.join(company_import_col_names) + ') VALUES (%s, %s, %s, %s, %s)'
             sqldata=[None]*len(company_import_col_names)
             if header_line:
                 header_line=False

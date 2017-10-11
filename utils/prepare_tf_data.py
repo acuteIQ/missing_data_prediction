@@ -30,14 +30,14 @@ else:
 print 'expecting', total_line_count, 'lines'
 
 processed_line_count = 0
-sqlcmd = 'SELECT industry_sic_code, city, state, county, id, cast(yearly_sales as numeric), number_of_employees, efx_creditperc, efx_failrate FROM company1 LEFT JOIN equifax ON company1.id=equifax.company_id ' + LIMIT
+sqlcmd = 'SELECT industry_sic_code, city, state, county, id, cast(yearly_sales as numeric), number_of_employees, efx_creditscore, efx_creditperc, efx_failrate FROM company1 LEFT JOIN equifax ON company1.id=equifax.company_id ' + LIMIT
 print sqlcmd
 conn=psycopg2.connect('dbname=acuteiq')
 cur2=conn.cursor()
 cur2.execute(sqlcmd)
 
 cur3=conn.cursor()
-cur3.execute(sqlcmd)
+#cur3.execute(sqlcmd)
 
 for row in cur2:
     industry_sic_code = row[0]
@@ -48,7 +48,8 @@ for row in cur2:
     yearly_sales = row[5]
     number_of_employees = row[6]
     credit_score = row[7]
-    business_risk = row[8]
+    credit_score_perc = row[8]
+    business_risk = row[9]
 
     city = coded_objects['city'][city_str]
     state = coded_objects['state'][state_str]
@@ -64,15 +65,16 @@ for row in cur2:
     else:
         number_of_employees = None
 
-    print ('yearly_sales', yearly_sales, 'yearly_sales_new', yearly_sales_new)
+    #print ('yearly_sales', yearly_sales, 'yearly_sales_new', yearly_sales_new)
     #print ('row_id', row_id, 'yearly_sales', yearly_sales_new, 'number_of_employees', number_of_employees,
     #       'credit_score', credit_score, 'business_risk', business_risk, 'industry_sic_code', industry_sic_code,
     #       'city_str', city_str, 'city', city, 'state_str', state_str,
     #       'state', state, 'county_str', county_str, 'county', county)
 
-    sqlcmd = "INSERT INTO company_tf_observation (id, yearly_sales, number_of_employees,  credit_score, business_risk, industry_sic_code,  city_str, city, state_str,  state, county_str, county) VALUES (%s, %s, %s,  %s, %s, %s,  %s, %s, %s,  %s, %s, %s )"
-    sqldata = (row_id, yearly_sales_new, number_of_employees, credit_score, business_risk, industry_sic_code, city_str, city, state_str, state, county_str, county)
-    #print sqlcmd, sqldata
+    sqlcmd = "INSERT INTO company_tf_observation (id, yearly_sales, number_of_employees, credit_score, credit_score_perc, business_risk, industry_sic_code,  city_str, city, state_str,  state, county_str, county) VALUES (%s, %s, %s,  %s, %s, %s,  %s, %s, %s,  %s, %s, %s, %s )"
+    sqldata = (row_id, yearly_sales_new, number_of_employees, credit_score, credit_score_perc, business_risk, industry_sic_code, city_str, city, state_str, state, county_str, county)
+    #print 'CMD', sqlcmd
+    #print 'DATA', sqldata
     cur3.execute(sqlcmd, sqldata)
     
     processed_line_count += 1

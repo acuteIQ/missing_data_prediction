@@ -12,10 +12,10 @@ pre_process();
 p = [1];
 phi = [1];
 
-factorization_model = {credit_score_X, {A, B}};
+factorization_model = {X, {A, B}};
 
 model = TFModel(factorization_model, p, phi);
-config = TFEngineConfig(model, 10);
+config = TFEngineConfig(model, 1000);
 engine = TFDefaultEngine(config, 'gtp_mex');
 engine.factorize();
 plot(engine.beta_divergence');

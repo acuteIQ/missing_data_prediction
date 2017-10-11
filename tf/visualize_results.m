@@ -1,9 +1,9 @@
 close all
 
-nnz_ind=logical(credit_score_X.data > 0.1);
-%plot(credit_score_X.data(nnz_ind));
+nnz_ind=logical(X.data > 0.1);
+%plot(X.data(nnz_ind));
 
-hist( credit_score_X.data(nnz_ind) );
+hist( X.data(nnz_ind) );
 title('target');
 xlabel('credit\_score');
 ylabel('count');
@@ -15,4 +15,4 @@ xlabel('credit\_score');
 ylabel('count');
 
 'RMSE'
-sqrt(mean((TFT_Tensors{4}.data(nnz_ind) -credit_score_X.data(nnz_ind)).^2))
+sqrt(mean((TFT_Tensors{4}.data(nnz_ind) - X.data(nnz_ind)).^2))
