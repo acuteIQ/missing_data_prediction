@@ -1,30 +1,30 @@
 
 conn = get_conn();
 
-industry_sic_code_index = Index(get_single_sql_result(conn, 'SELECT max(industry_sic_code) FROM company_tf_observation_orig'));
+industry_sic_code_index = Index(get_single_sql_result(conn, 'SELECT max(industry_sic_code) FROM company_tf_observation'));
 
-state_index = Index(get_single_sql_result(conn, 'SELECT max(state) FROM company_tf_observation_orig'));
+state_index = Index(get_single_sql_result(conn, 'SELECT max(state) FROM company_tf_observation'));
 
-%state_index = Index(get_single_sql_result(conn, 'SELECT max(state) FROM company_tf_observation_orig'));
+%state_index = Index(get_single_sql_result(conn, 'SELECT max(state) FROM company_tf_observation'));
 
 %county_index = Index(get_single_sql_result(conn, ...
-%    'SELECT max(county) FROM company_tf_observation_orig'));
+%    'SELECT max(county) FROM company_tf_observation'));
 
 %number_of_employees_index = Index(get_single_sql_result(conn, ...
-%    'SELECT max(number_of_employees) FROM company_tf_observation_orig'));
+%    'SELECT max(number_of_employees) FROM company_tf_observation'));
 
 %credit_score_index = Index(get_single_sql_result(conn, ...
-%    'SELECT max(credit_score) FROM company_tf_observation_orig'));
+%    'SELECT max(credit_score) FROM company_tf_observation'));
 
 %business_risk_index = Index(get_single_sql_result(conn, ...
-%    'SELECT max(business_risk) FROM company_tf_observation_orig'));
+%    'SELECT max(business_risk) FROM company_tf_observation'));
 
 topic_index = Index(10);
 
 sql_cmd = [ 'SELECT ' ...
             ' industry_sic_code, state, ' ...
             ' credit_score '...
-            ' FROM company_tf_observation_orig ' ...
+            ' FROM company_tf_observation ' ...
             ' WHERE ' ...
             ' industry_sic_code IS NOT NULL AND ' ...
             ' state IS NOT NULL AND ' ...
@@ -51,12 +51,16 @@ X.data = ones(...
 %                   )*eps*1000; 
 
 for r_ind = 1:size(sql_data,1)
-    if isnan(sql_data{r_ind, end}) == 0
-        X.data( ...
-            sql_data{r_ind, {'industry_sic_code'}}, ...
-            sql_data{r_ind, {'state'}} ...
-            ) = sql_data{r_ind, {'credit_score'}}+1;
+    %if isnan(sql_data{r_ind, end}) == 0
+    isc = sql_data{r_ind, {'industry_sic_code'}};
+    state = sql_data{r_ind, {'state'}};
+
+    if X.data( isc, state) < 0.1
+        X.data( isc, state ) = sql_data{r_ind, {'credit_score'}};
+    else
+        X.data( isc, state ) = (X.data( isc, state ) + sql_data{r_ind, {'credit_score'}})/2;
     end
+    %end
 end
 
 A = Tensor(industry_sic_code_index, topic_index);
